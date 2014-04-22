@@ -4,13 +4,13 @@ ShippingManagerPoC
 A SAPUI5 application that consumes SAP NetWeaver Gateway OData Service
 
 Step 1: Make a SAPUI5 web app
-- Create a SAPUI5 project in Eclipse
+- Create an empty SAPUI5 project in Eclipse
 - Replace the WebContent of your project by the WebContent here
 - Run your application in Eclipse, it should be working on your web browsers
 
 Step 2: Transform your web app to PhoneGap hybrid app
 - Create a phonegap project on your computer
-- Replace the content of www by the files you find in PhoneGap/www
+- Replace the content of www folder by the files you find in PhoneGap/www
 - Unzip PhoneGap/resources.zip (sapui5 core lib) to www folder
 - Copy all the files in WebContent to www folder
 - Modify some parts of index.html (follow the comments) depending on which platforms you want to build
