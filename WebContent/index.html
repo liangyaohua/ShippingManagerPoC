@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv='Content-Type' content='text/html;charset=UTF-8'/>
+		<meta name="format-detection" content="telephone=no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+		
+		<script src="resources/sap-ui-core.js"
+				id="sap-ui-bootstrap"
+				data-sap-ui-libs="sap.m"
+				data-sap-ui-theme="sap_bluecrystal">
+		</script>
+		<!-- only load the mobile lib "sap.m" and the "sap_mvi" theme -->   
+		
+	</head>
+	<body class="sapUiBody" role="application">
+		<div id="content"></div>
+		
+		<!-- Enable phonegap when building phonegap app -->
+		<!-- script type="text/javascript" src="phonegap.js"></script -->
+		
+		<script type="text/javascript">
+			function getServiceUrl(sUrl) {
+				  //for local testing prefix with proxy
+				  //if you and your team use a special host name or IP like 127.0.0.1 for localhost please adapt the if statement below 
+				  if (window.location.hostname == "localhost") {
+				      return "proxy" + sUrl;
+				  } else {
+				      return sUrl;
+				  }
+			}
+			
+			// Here is your OData service without {protocol}://{host name}:{port number}:
+			var sUrl= getServiceUrl("/sap/opu/odata/sap/Z_READ_VTTK_SRV/");
+			
+			// Initialization of OData model
+			var oModel = new sap.ui.model.odata.ODataModel(sUrl, false, "SOLMAN_ADMIN", "SolMan71");
+			sap.ui.getCore().setModel(oModel);
+			
+			// When building PhoneGap hybrid app, use the codes below instead of the two lines above, see here for explaination
+			// https://sapui5.netweaver.ondemand.com/sdk/docs/guide/WebContainer.html
+			/*  
+			var oModel = null;
+			   
+		   	function onDeviceReady() {
+		    	oModel = new sap.ui.model.odata.ODataModel(sUrl, false, "SOLMAN_ADMIN", "SolMan71");
+		    	sap.ui.getCore().setModel(oModel);
+		    }
+		   	<!-- bind to the deviceready event -->
+		   	document.addEventListener('deviceready', onDeviceReady, false);
+			*/
+		</script>
+		
+		<script type="text/javascript" src="app.js"></script>
+	</body>
+</html>
