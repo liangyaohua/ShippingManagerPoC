@@ -77,10 +77,17 @@
 		<servlet-name>SimpleProxyServlet</servlet-name>
 		<url-pattern>/proxy/*</url-pattern>
 	</servlet-mapping>
+	
+	
+	<!-- ============================================================== -->
+	<!-- OData server                                                   -->
+	<!-- ============================================================== -->
+	
 	<context-param>
 	    <param-name>com.sap.ui5.proxy.REMOTE_LOCATION</param-name>
 	    <param-value>http://frparssm71.corp.capgemini.com:8000</param-value>
 	</context-param>
+	
 
 	<!-- ============================================================== -->
 	<!-- Welcome file list                                              -->
