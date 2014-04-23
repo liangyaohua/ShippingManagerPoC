@@ -16,4 +16,8 @@ Step 2: Transform your web app to PhoneGap hybrid app
 - Modify some parts of index.html (follow the comments) depending on which platforms you want to build
 - Build and run your phonegap project, it should be working on your mobile phone
 
-See Tutorial/ for more informations on how to setup the development environment and build the SAPUI5 application.
+See the tutorial for more informations on how to setup the development environment and build the SAPUI5 application.
+
+Tutorial:
+
+https://onedrive.live.com/redir?resid=BC9FD43D184D5D9D!363&authkey=!ANpHwO7rnjZlqEo&ithint=file%2c.docx
