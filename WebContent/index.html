@@ -19,15 +19,15 @@
 	<body class="sapUiBody" role="application">
 		<div id="content"></div>
 		
-		<!-- Enable phonegap.js when building phonegap app -->
+		<!-- uncomment the script below when building PhoneGap App -->
 		<!-- script type="text/javascript" src="phonegap.js"></script -->
 		
 		<script type="text/javascript">
-			<!-- For web local testing -->
+			<!-- In Eclipse -->
 			
 			function getServiceUrl(sUrl) {
-				//for local testing prefix with proxy
-				//if you and your team use a special host name or IP like 127.0.0.1 for localhost please adapt the if statement below 
+				//	for local testing prefix with proxy
+				//	if you and your team use a special host name or IP like 127.0.0.1 for localhost please adapt the statement below 
 				if (window.location.hostname == "localhost") {
 				    return "proxy" + sUrl;
 				} else {
@@ -35,35 +35,35 @@
 				}
 			}
 			
-			// OData service without {protocol}://{host name}:{port number}:
+			//	OData service for displaying shipment detail
 			var sUrl = getServiceUrl("/sap/opu/odata/sap/Z_READ_VTTK_SRV/");
 			
-			// Initialization of OData model
+			//	construct OData model
 			var oModel = new sap.ui.model.odata.ODataModel(sUrl, false, "SOLMAN_ADMIN", "SolMan71");
+			
+			//	bind data model to Core
 			sap.ui.getCore().setModel(oModel);
 			
-			// OData service for updating the status of a shipment
+			// 	OData service for updating the status of a shipment
 			var sUrl2 = getServiceUrl("/sap/opu/odata/sap/Z_UPDATE_VTTK_SRV/");
 			var oModel2 = new sap.ui.model.odata.ODataModel(sUrl2, false, "SOLMAN_ADMIN", "SolMan71");
 
-			<!-- End web local testing -->
+			<!-- In Eclipse -->
 			
 			/******************************************************************************************************* 
-			* When building PhoneGap hybrid app, make all the js code above in comment, use the code below instead *
+			* When building PhoneGap hybrid App, make all the js code above in comment, use the code below instead *
 			* see here for explaination https://sapui5.netweaver.ondemand.com/sdk/docs/guide/WebContainer.html     *
 			*******************************************************************************************************/
 			
-			<!-- For PhoneGap -->
+			<!-- PhoneGap -->
 			/*
-			// OData service
 			var sUrl = "http://frparssm71.corp.capgemini.com:8000/sap/opu/odata/sap/Z_READ_VTTK_SRV";
-			var oModel = null;
+			var oModel = null;	
 			
-			// OData service for updating the status of a shipment
 			var sUrl2 = "http://frparssm71.corp.capgemini.com:8000/sap/opu/odata/sap/Z_UPDATE_VTTK_SRV/";
 			var oModel2 = null;
 			
-			// Bind model when device is ready			
+			//	construct and models when device is ready			
 		   	function onDeviceReady() {
 				oModel = new sap.ui.model.odata.ODataModel(sUrl, false, "SOLMAN_ADMIN", "SolMan71");
 				sap.ui.getCore().setModel(oModel);
@@ -71,11 +71,10 @@
 				oModel2 = new sap.ui.model.odata.ODataModel(sUrl2, false, "SOLMAN_ADMIN", "SolMan71");
 			}
 			
-			// bind to the deviceready event
+			// 	bind to the deviceready event
 		   	document.addEventListener('deviceready', onDeviceReady, false);
 			*/
-			<!-- End PhoneGap -->
-			
+			<!-- PhoneGap -->
 		</script>
 		
 		<script type="text/javascript" src="app.js"></script>
