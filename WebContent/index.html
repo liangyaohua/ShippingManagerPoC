@@ -35,13 +35,17 @@
 				}
 			}
 			
-			// Here is your OData service without {protocol}://{host name}:{port number}:
+			// OData service without {protocol}://{host name}:{port number}:
 			var sUrl = getServiceUrl("/sap/opu/odata/sap/Z_READ_VTTK_SRV/");
 			
 			// Initialization of OData model
 			var oModel = new sap.ui.model.odata.ODataModel(sUrl, false, "SOLMAN_ADMIN", "SolMan71");
 			sap.ui.getCore().setModel(oModel);
 			
+			// OData service for updating the status of a shipment
+			var sUrl2 = getServiceUrl("/sap/opu/odata/sap/Z_UPDATE_VTTK_SRV/");
+			var oModel2 = new sap.ui.model.odata.ODataModel(sUrl2, false, "SOLMAN_ADMIN", "SolMan71");
+
 			<!-- End web local testing -->
 			
 			/******************************************************************************************************* 
@@ -55,16 +59,23 @@
 			var sUrl = "http://frparssm71.corp.capgemini.com:8000/sap/opu/odata/sap/Z_READ_VTTK_SRV";
 			var oModel = null;
 			
+			// OData service for updating the status of a shipment
+			var sUrl2 = "http://frparssm71.corp.capgemini.com:8000/sap/opu/odata/sap/Z_UPDATE_VTTK_SRV/";
+			var oModel2 = null;
+			
 			// Bind model when device is ready			
 		   	function onDeviceReady() {
 				oModel = new sap.ui.model.odata.ODataModel(sUrl, false, "SOLMAN_ADMIN", "SolMan71");
 				sap.ui.getCore().setModel(oModel);
+				
+				oModel2 = new sap.ui.model.odata.ODataModel(sUrl2, false, "SOLMAN_ADMIN", "SolMan71");
 			}
 			
 			// bind to the deviceready event
 		   	document.addEventListener('deviceready', onDeviceReady, false);
 			*/
 			<!-- End PhoneGap -->
+			
 		</script>
 		
 		<script type="text/javascript" src="app.js"></script>
