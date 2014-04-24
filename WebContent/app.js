@@ -45,7 +45,7 @@ var oSearchField = new sap.m.SearchField({
 		if(aShipment != "") {
 			//	set path to this shipment
 			oPath = "/SHIPMENT('"+ aShipment +"')";
-	 		
+	 					
 			// 	refresh OData model before reading it 
 			//	in case that service has been modified
 			oModel.refresh();
@@ -67,15 +67,15 @@ var oSearchField = new sap.m.SearchField({
     					oButton.setEnabled(false);
 					}
 				} else {
-					alert(aShipment + " doesn't exist");
+					sap.m.MessageToast.show(aShipment + " doesn't exist");
 				}
 			},function(){
 				//	read failed
-				alert("Couldn't find the service, please verify your network connection");
+				sap.m.MessageToast.show("Couldn't find the service, please verify your network connection");
 			});
 		} else {
 			//	search field is empty
-			alert("Please enter a shipment number");
+			sap.m.MessageToast.show("Please enter a shipment number");
 		}
 	}
 });
@@ -112,7 +112,7 @@ app.placeAt("content");
 function updateStatus() {
 	//	disable the button after it has been clicked already
 	oButton.setEnabled(false);
-	
+
 	// 	read update result
 	oModel2.read(oPath, null, null, true, function(oData){
 		//	if success, Status returned should be "6" 
@@ -135,7 +135,7 @@ function updateStatus() {
 					oButton.setEnabled();
 				} else if(JSON.stringify(oData.Sttrg) == '"6"') {
 					//	status is updated to 6
-					alert("Update successful");
+					sap.m.MessageToast.show("Update successful!");
 				} else {
 					//	someone has modified the status
 					return;
@@ -144,9 +144,9 @@ function updateStatus() {
 				return;
 			});
 		} else {
-			alert("Update failed, please refresh the shipment detail and try it again");
+			sap.m.MessageToast.show("Update failed, please refresh the shipment detail and try it again");
 		}
 	},function(){
-		alert("Couldn't find the service, please verify your network connection");
+		sap.m.MessageToast.show("Couldn't find the service, please verify your network connection");
 	});
 }
