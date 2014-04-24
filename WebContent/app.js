@@ -76,7 +76,7 @@ var oSearchField = new sap.m.SearchField({
     					oButton.setEnabled(false);
 					}
 				} else {
-					sap.m.MessageBox.show(aShipment + " doesn't exist", sap.m.MessageBox.Icon.INFORMATION);
+					sap.m.MessageBox.show(aShipment + " doesn't exist", sap.m.MessageBox.Icon.WARNING);
 				}
 			    
 				//	hide busy indicator
@@ -153,7 +153,7 @@ function updateStatus() {
 					oButton.setEnabled();
 				} else if(JSON.stringify(oData.Sttrg) == '"6"') {
 					//	status is updated to 6
-					sap.m.MessageBox.show("Update successful!", sap.m.MessageBox.Icon.SUCCESS);
+					sap.m.MessageBox.show("Update successful", sap.m.MessageBox.Icon.SUCCESS);
 				} else {
 					//	someone has modified the status
 					return;
@@ -162,7 +162,11 @@ function updateStatus() {
 				return;
 			});
 		} else {
-			sap.m.MessageBox.show("Update failed, please refresh the shipment detail and try it again", sap.m.MessageBox.Icon.ERROR);
+			if(JSON.stringify(oData.Message) != '""') {
+				sap.m.MessageBox.show(JSON.stringify(oData.Message), sap.m.MessageBox.Icon.ERROR, "", sap.m.MessageBox.Action.OK, function(){oButton.setEnabled();});
+			} else {
+				sap.m.MessageBox.show("Uncaught error, please try it later", sap.m.MessageBox.Icon.ERROR, "", sap.m.MessageBox.Action.OK, function(){oButton.setEnabled();});
+			}
 		}
 		
 		oBusyIndicator.setVisible(false);
