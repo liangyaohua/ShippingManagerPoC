@@ -6,6 +6,12 @@ var app = new sap.m.App("ShippingManager", {initialPage:"homepage"});
 var aShipment = "";
 var oPath = "";
 
+//	create a busy indicator
+var oBusyIndicator = new sap.m.BusyIndicator({visible: false, design: "light"});
+
+//	include MessageBox class
+jQuery.sap.require("sap.m.MessageBox");
+
 // 	create a list for displaying the detail of a shipment
 //	bind values to the data model
 var oList = new sap.m.List({
@@ -45,7 +51,10 @@ var oSearchField = new sap.m.SearchField({
 		if(aShipment != "") {
 			//	set path to this shipment
 			oPath = "/SHIPMENT('"+ aShipment +"')";
-	 					
+	 		
+			//	show busy indicator
+			oBusyIndicator.setVisible(true);
+			
 			// 	refresh OData model before reading it 
 			//	in case that service has been modified
 			oModel.refresh();
@@ -67,15 +76,19 @@ var oSearchField = new sap.m.SearchField({
     					oButton.setEnabled(false);
 					}
 				} else {
-					sap.m.MessageToast.show(aShipment + " doesn't exist");
+					sap.m.MessageBox.show(aShipment + " doesn't exist", sap.m.MessageBox.Icon.INFORMATION);
 				}
 			},function(){
 				//	read failed
-				sap.m.MessageToast.show("Couldn't find the service, please verify your network connection");
+				sap.m.MessageBox.show("Couldn't find the service, please verify your network connection", sap.m.MessageBox.Icon.ERROR);
 			});
+			
+			//	hide busy indicator
+			oBusyIndicator.setVisible(false);
+			
 		} else {
 			//	search field is empty
-			sap.m.MessageToast.show("Please enter a shipment number");
+			sap.m.MessageBox.show("Please enter a shipment number", sap.m.MessageBox.Icon.WARNING);
 		}
 	}
 });
@@ -97,6 +110,7 @@ var homepage = new sap.m.Page("homepage", {
     	        	  text: "Created by Capgemini"
     	          })
         ],
+        contentMiddle: [oBusyIndicator],
         contentRight: [oButton]
     })           
   });
@@ -112,7 +126,10 @@ app.placeAt("content");
 function updateStatus() {
 	//	disable the button after it has been clicked already
 	oButton.setEnabled(false);
-
+	
+	//	show busy indicator
+	oBusyIndicator.setVisible(true);
+	
 	// 	read update result
 	oModel2.read(oPath, null, null, true, function(oData){
 		//	if success, Status returned should be "6" 
@@ -135,7 +152,7 @@ function updateStatus() {
 					oButton.setEnabled();
 				} else if(JSON.stringify(oData.Sttrg) == '"6"') {
 					//	status is updated to 6
-					sap.m.MessageToast.show("Update successful!");
+					sap.m.MessageBox.show("Update successful!", sap.m.MessageBox.Icon.SUCCESS);
 				} else {
 					//	someone has modified the status
 					return;
@@ -144,9 +161,12 @@ function updateStatus() {
 				return;
 			});
 		} else {
-			sap.m.MessageToast.show("Update failed, please refresh the shipment detail and try it again");
+			sap.m.MessageBox.show("Update failed, please refresh the shipment detail and try it again", sap.m.MessageBox.Icon.ERROR);
 		}
 	},function(){
-		sap.m.MessageToast.show("Couldn't find the service, please verify your network connection");
+		sap.m.MessageBox.show("Couldn't find the service, please verify your network connection", sap.m.MessageBox.Icon.ERROR);
 	});
+	
+	//	hide busy indicator
+	oBusyIndicator.setVisible(false);
 }
