@@ -78,17 +78,18 @@ var oSearchField = new sap.m.SearchField({
 				} else {
 					sap.m.MessageBox.show(aShipment + " doesn't exist", sap.m.MessageBox.Icon.INFORMATION);
 				}
+			    
+				//	hide busy indicator
+				oBusyIndicator.setVisible(false);
 			},function(){
 				//	read failed
 				sap.m.MessageBox.show("Couldn't find the service, please verify your network connection", sap.m.MessageBox.Icon.ERROR);
-			});
-			
-			//	hide busy indicator
-			oBusyIndicator.setVisible(false);
-			
+				oBusyIndicator.setVisible(false);
+			});		
 		} else {
 			//	search field is empty
 			sap.m.MessageBox.show("Please enter a shipment number", sap.m.MessageBox.Icon.WARNING);
+			oBusyIndicator.setVisible(false);
 		}
 	}
 });
@@ -163,10 +164,10 @@ function updateStatus() {
 		} else {
 			sap.m.MessageBox.show("Update failed, please refresh the shipment detail and try it again", sap.m.MessageBox.Icon.ERROR);
 		}
+		
+		oBusyIndicator.setVisible(false);
 	},function(){
 		sap.m.MessageBox.show("Couldn't find the service, please verify your network connection", sap.m.MessageBox.Icon.ERROR);
+		oBusyIndicator.setVisible(false);
 	});
-	
-	//	hide busy indicator
-	oBusyIndicator.setVisible(false);
 }
