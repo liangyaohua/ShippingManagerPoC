@@ -17,6 +17,10 @@ jQuery.sap.require("sap.m.MessageBox");
 //	bind values to the data model
 var oList = new sap.m.List({
 	items: [
+		new sap.m.DisplayListItem({
+			label: "Shipment",
+			value: "{Tknum}"
+		}),
 	    new sap.m.DisplayListItem({
 	    	label: "Shipment type",
 	    	value: "{Shtyp}"
@@ -48,47 +52,48 @@ var oSearchField = new sap.m.SearchField({
 		//	get the shipment number
 		aShipment = oEvent.getParameter("query");
 		
+		//	set path to this shipment
+		oPath = "/SHIPMENT('"+ aShipment +"')";
+		
+		//	refresh shipment detail (helper function)
+		// 	clear old list, rebind data, add new list
+		refreshDetail();
+		
 		//	make sure that user has entered a shipment number
 		if(aShipment != "") {
-			//	set path to this shipment
-			oPath = "/SHIPMENT('"+ aShipment +"')";
-	 		
-			//	show busy dialog
+			//	open busy dialog and block the UI during loading data
 			oBusyDialog.open();
-			
-			// 	refresh OData model before reading it 
-			//	in case that service has been modified
-			oModel.refresh();
 			
 			//	read shipment detail
 			oModel.read(oPath, null, null, true, function(oData){
-				//	if success and shipment exist, Tknum returned (shipment number) should not be empty
+				//	read successful, close busy dialog
+				oBusyDialog.close();
+				
+				//	if shipment exist, Tknum returned (shipment number) should not be empty
 				if(JSON.stringify(oData.Tknum) != '""' && oData.Tknum != undefined) {
-					// clear old list, rebind data, add new list
-					/* not efficient, will be reviewed later */
-					homepage.removeContent(oList);
-					oList.bindElement(oPath);
-    				homepage.addContent(oList);
-    				
-					//	if status is "5" (be careful, not 5, it's "5") 
+					//	if status is "5" (be careful, not 5, it's "5"), enable oButton 
     				if(JSON.stringify(oData.Sttrg) == '"5"') {
     					oButton.setEnabled();
 					} else {
     					oButton.setEnabled(false);
 					}
 				} else {
+					//	if shipment doesn't exist, oList is empty, oButton should be disabled
+					oButton.setEnabled(false);
 					sap.m.MessageBox.show(aShipment + " doesn't exist", sap.m.MessageBox.Icon.WARNING);
 				}
-			    
-				//	hide busy dialog
-				oBusyDialog.close();
 			},function(){
-				//	read failed
-				sap.m.MessageBox.show("Couldn't find the service, please verify your network connection", sap.m.MessageBox.Icon.ERROR);
+				//	read failed, close busy dialog
 				oBusyDialog.close();
+				
+				//	oList is empty, oButton should be disabled
+				oButton.setEnabled(false);
+				
+				sap.m.MessageBox.show("Couldn't find the service, please verify your network connection", sap.m.MessageBox.Icon.ERROR);
 			});		
 		} else {
-			//	search field is empty
+			//	search field is empty, no data, oButton should be disabled
+			oButton.setEnabled(false);
 			sap.m.MessageBox.show("Please enter a shipment number", sap.m.MessageBox.Icon.WARNING);
 		}
 	}
@@ -121,26 +126,36 @@ app.addPage(homepage);
 // 	place the App into the HTML document
 app.placeAt("content"); 
 
-//	helper function
+//	my helper functions
+
+//	refresh the shipment detail
+function refreshDetail(){
+	// 	refresh OData model 
+	//	in case that service has been modified
+	oModel.refresh();
+	
+	//	clear old list, rebind data, add new list
+	homepage.removeContent(oList);
+	oList.bindElement(oPath);
+	homepage.addContent(oList);
+}
+
 // 	update the status of a shipment
 function updateStatus() {
-	//	show busy indicator and disable the UI
+	//	open busy dialog and disable the UI during updating
 	oBusyDialog2.open();
 	
 	// 	read update result
 	oModel2.read(oPath, null, null, true, function(oData){
-		//	if success, Status returned should be "6" 
+		//	if update successful, Status returned should be "6" 
 		if(JSON.stringify(oData.Status) == '"6"') {
-			// 	refresh OData model 
-			//	in case that service has been modified (someone has updated the status)
-			oModel.refresh();
-			
-			//	reload shipment detail
+						
+			//	reload shipment detail and verify if update is successful
 			oModel.read(oPath, null, null, true, function(oData){
-				//	clear old list, rebind data, add new list
-				homepage.removeContent(oList);
-				oList.bindElement(oPath);
-				homepage.addContent(oList);
+				refreshDetail();
+				
+				//	read oModel and oModel2 successful, close busy dialog
+				oBusyDialog2.close();
 				
 				//	if Sttrg (status) is still "5", means someone has updated the status (to 6) before you
 				//	your click just rolled back the status to 5
@@ -158,19 +173,23 @@ function updateStatus() {
 					oButton.setEnabled(false);
 				}
 			},function(){
-				return;
+				//	reload shipment detail failed, close busy dialog
+				oBusyDialog2.close();
 			});
 		} else {
+			//	Status returned is not 6, update failed, close busy dialog
+			oBusyDialog2.close();
+			
 			if(JSON.stringify(oData.Message) != '""') {
+				//	show error message returned from SAP
 				sap.m.MessageBox.show(JSON.stringify(oData.Message), sap.m.MessageBox.Icon.ERROR);
 			} else {
 				sap.m.MessageBox.show("Uncaught error, please try it later", sap.m.MessageBox.Icon.ERROR);
 			}
 		}
-		
-		oBusyDialog2.close();
 	},function(){
-		sap.m.MessageBox.show("Couldn't find the service, please verify your network connection", sap.m.MessageBox.Icon.ERROR);
+		//	read update result failed
 		oBusyDialog2.close();
+		sap.m.MessageBox.show("Couldn't find the service, please verify your network connection", sap.m.MessageBox.Icon.ERROR);
 	});
 }
