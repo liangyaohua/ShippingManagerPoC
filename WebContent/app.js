@@ -6,8 +6,9 @@ var app = new sap.m.App("ShippingManager", {initialPage:"homepage"});
 var aShipment = "";
 var oPath = "";
 
-//	create a busy indicator
-var oBusyIndicator = new sap.m.BusyIndicator({visible: false, design: "light"});
+//	create two busy dialogs
+var oBusyDialog = new sap.m.BusyDialog({text: "Loading..."});
+var oBusyDialog2 = new sap.m.BusyDialog({text: "Updating..."});
 
 //	include MessageBox class
 jQuery.sap.require("sap.m.MessageBox");
@@ -41,7 +42,7 @@ var oButton = new sap.m.Button({
 
 // 	create a search field
 var oSearchField = new sap.m.SearchField({
-	placeholder: "shippment number",
+	placeholder: "shipment number",
 	width: "100%",
 	search: function(oEvent){
 		//	get the shipment number
@@ -52,8 +53,8 @@ var oSearchField = new sap.m.SearchField({
 			//	set path to this shipment
 			oPath = "/SHIPMENT('"+ aShipment +"')";
 	 		
-			//	show busy indicator
-			oBusyIndicator.setVisible(true);
+			//	show busy dialog
+			oBusyDialog.open();
 			
 			// 	refresh OData model before reading it 
 			//	in case that service has been modified
@@ -64,7 +65,7 @@ var oSearchField = new sap.m.SearchField({
 				//	if success and shipment exist, Tknum returned (shipment number) should not be empty
 				if(JSON.stringify(oData.Tknum) != '""' && oData.Tknum != undefined) {
 					// clear old list, rebind data, add new list
-					/* not efficient, could be reviewed later */
+					/* not efficient, will be reviewed later */
 					homepage.removeContent(oList);
 					oList.bindElement(oPath);
     				homepage.addContent(oList);
@@ -79,17 +80,16 @@ var oSearchField = new sap.m.SearchField({
 					sap.m.MessageBox.show(aShipment + " doesn't exist", sap.m.MessageBox.Icon.WARNING);
 				}
 			    
-				//	hide busy indicator
-				oBusyIndicator.setVisible(false);
+				//	hide busy dialog
+				oBusyDialog.close();
 			},function(){
 				//	read failed
 				sap.m.MessageBox.show("Couldn't find the service, please verify your network connection", sap.m.MessageBox.Icon.ERROR);
-				oBusyIndicator.setVisible(false);
+				oBusyDialog.close();
 			});		
 		} else {
 			//	search field is empty
 			sap.m.MessageBox.show("Please enter a shipment number", sap.m.MessageBox.Icon.WARNING);
-			oBusyIndicator.setVisible(false);
 		}
 	}
 });
@@ -111,7 +111,6 @@ var homepage = new sap.m.Page("homepage", {
     	        	  text: "Created by Capgemini"
     	          })
         ],
-        contentMiddle: [oBusyIndicator],
         contentRight: [oButton]
     })           
   });
@@ -125,11 +124,8 @@ app.placeAt("content");
 //	helper function
 // 	update the status of a shipment
 function updateStatus() {
-	//	disable the button after it has been clicked already
-	oButton.setEnabled(false);
-	
-	//	show busy indicator
-	oBusyIndicator.setVisible(true);
+	//	show busy indicator and disable the UI
+	oBusyDialog2.open();
 	
 	// 	read update result
 	oModel2.read(oPath, null, null, true, function(oData){
@@ -150,28 +146,31 @@ function updateStatus() {
 				//	your click just rolled back the status to 5
 				//	because the update request performs like clicking the button Shipment start in SAP system
 				if(JSON.stringify(oData.Sttrg) == '"5"') {
-					oButton.setEnabled();
+					//	someone has already updated the status, but you rolled it back
+					sap.m.MessageBox.show("Please try it again", sap.m.MessageBox.Icon.WARNING);
 				} else if(JSON.stringify(oData.Sttrg) == '"6"') {
 					//	status is updated to 6
 					sap.m.MessageBox.show("Update successful", sap.m.MessageBox.Icon.SUCCESS);
+					oButton.setEnabled(false);
 				} else {
 					//	someone has modified the status
-					return;
+					sap.m.MessageBox.show("Update failed, the status has been modified", sap.m.MessageBox.Icon.WARNING);
+					oButton.setEnabled(false);
 				}
 			},function(){
 				return;
 			});
 		} else {
 			if(JSON.stringify(oData.Message) != '""') {
-				sap.m.MessageBox.show(JSON.stringify(oData.Message), sap.m.MessageBox.Icon.ERROR, "", sap.m.MessageBox.Action.OK, function(){oButton.setEnabled();});
+				sap.m.MessageBox.show(JSON.stringify(oData.Message), sap.m.MessageBox.Icon.ERROR);
 			} else {
-				sap.m.MessageBox.show("Uncaught error, please try it later", sap.m.MessageBox.Icon.ERROR, "", sap.m.MessageBox.Action.OK, function(){oButton.setEnabled();});
+				sap.m.MessageBox.show("Uncaught error, please try it later", sap.m.MessageBox.Icon.ERROR);
 			}
 		}
 		
-		oBusyIndicator.setVisible(false);
+		oBusyDialog2.close();
 	},function(){
 		sap.m.MessageBox.show("Couldn't find the service, please verify your network connection", sap.m.MessageBox.Icon.ERROR);
-		oBusyIndicator.setVisible(false);
+		oBusyDialog2.close();
 	});
 }
