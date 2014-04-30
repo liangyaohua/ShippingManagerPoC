@@ -51,51 +51,7 @@ var oSearchField = new sap.m.SearchField({
 	search: function(oEvent){
 		//	get the shipment number
 		aShipment = oEvent.getParameter("query");
-		
-		//	set path to this shipment
-		oPath = "/SHIPMENT('"+ aShipment +"')";
-		
-		//	refresh shipment detail (helper function)
-		// 	clear old list, rebind data, add new list
-		refreshDetail();
-		
-		//	make sure that user has entered a shipment number
-		if(aShipment != "") {
-			//	open busy dialog and block the UI during loading data
-			oBusyDialog.open();
-			
-			//	read shipment detail
-			oModel.read(oPath, null, null, true, function(oData){
-				//	read successful, close busy dialog
-				oBusyDialog.close();
-				
-				//	if shipment exist, Tknum returned (shipment number) should not be empty
-				if(JSON.stringify(oData.Tknum) != '""' && oData.Tknum != undefined) {
-					//	if status is "5" (be careful, not 5, it's "5"), enable oButton 
-    				if(JSON.stringify(oData.Sttrg) == '"5"') {
-    					oButton.setEnabled();
-					} else {
-    					oButton.setEnabled(false);
-					}
-				} else {
-					//	if shipment doesn't exist, oList is empty, oButton should be disabled
-					oButton.setEnabled(false);
-					sap.m.MessageBox.show(aShipment + " doesn't exist", sap.m.MessageBox.Icon.WARNING);
-				}
-			},function(){
-				//	read failed, close busy dialog
-				oBusyDialog.close();
-				
-				//	oList is empty, oButton should be disabled
-				oButton.setEnabled(false);
-				
-				sap.m.MessageBox.show("Couldn't find the service, please verify your network connection", sap.m.MessageBox.Icon.ERROR);
-			});		
-		} else {
-			//	search field is empty, no data, oButton should be disabled
-			oButton.setEnabled(false);
-			sap.m.MessageBox.show("Please enter a shipment number", sap.m.MessageBox.Icon.WARNING);
-		}
+		displayDetail(aShipment);
 	}
 });
 
@@ -138,6 +94,54 @@ function refreshDetail(){
 	homepage.removeContent(oList);
 	oList.bindElement(oPath);
 	homepage.addContent(oList);
+}
+
+//	display the shipment detail
+function displayDetail(aShipment){
+	//	set path to this shipment
+	oPath = "/SHIPMENT('"+ aShipment +"')";
+	
+	//	refresh shipment detail (helper function)
+	// 	clear old list, rebind data, add new list
+	refreshDetail();
+	
+	//	make sure that user has entered a shipment number
+	if(aShipment != "") {
+		//	open busy dialog and block the UI during loading data
+		oBusyDialog.open();
+		
+		//	read shipment detail
+		oModel.read(oPath, null, null, true, function(oData){
+			//	read successful, close busy dialog
+			oBusyDialog.close();
+			
+			//	if shipment exist, Tknum returned (shipment number) should not be empty
+			if(JSON.stringify(oData.Tknum) != '""' && oData.Tknum != undefined) {
+				//	if status is "5" (be careful, not 5, it's "5"), enable oButton 
+				if(JSON.stringify(oData.Sttrg) == '"5"') {
+					oButton.setEnabled();
+				} else {
+					oButton.setEnabled(false);
+				}
+			} else {
+				//	if shipment doesn't exist, oList is empty, oButton should be disabled
+				oButton.setEnabled(false);
+				sap.m.MessageBox.show(aShipment + " doesn't exist", sap.m.MessageBox.Icon.WARNING);
+			}
+		},function(){
+			//	read failed, close busy dialog
+			oBusyDialog.close();
+			
+			//	oList is empty, oButton should be disabled
+			oButton.setEnabled(false);
+			
+			sap.m.MessageBox.show("Couldn't find the service, please verify your network connection", sap.m.MessageBox.Icon.ERROR);
+		});		
+	} else {
+		//	search field is empty, no data, oButton should be disabled
+		oButton.setEnabled(false);
+		sap.m.MessageBox.show("Please enter a shipment number", sap.m.MessageBox.Icon.WARNING);
+	}
 }
 
 // 	update the status of a shipment
