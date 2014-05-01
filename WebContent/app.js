@@ -71,20 +71,20 @@ var oButton = new sap.m.Button({
 //	add oButton to footer
 var homepage = new sap.m.Page("homepage", {
 	title: "Shipping Manager",
-    showNavButton: false,
-    headerContent: [oBarcode],
-    subHeader: new sap.m.Bar({
-    	contentMiddle: [oSearchField]
-    }),
-    content: [oList],
-    footer: new sap.m.Bar({
-    	contentLeft: [
-    	          new sap.m.Label({
-    	        	  text: "Created by Capgemini"
-    	          })
-        ],
-        contentRight: [oButton]
-    })           
+    	showNavButton: false,
+    	headerContent: [oBarcode],
+    	subHeader: new sap.m.Bar({
+    		contentMiddle: [oSearchField]
+    	}),
+    	content: [oList],
+    	footer: new sap.m.Bar({
+    		contentLeft: [
+    	          	new sap.m.Label({
+    	        	  	text: "Created by Capgemini"
+    	          	})
+        	],
+        	contentRight: [oButton]
+    	})           
   });
 
 // 	add homepage to the App
@@ -104,7 +104,7 @@ function scanBarcode(){
 		function (error) {
 			alert("Scanning failed: " + error);
 		}
-   );
+   	);
 }
 
 //	refresh the shipment detail
