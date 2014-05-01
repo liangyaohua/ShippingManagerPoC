@@ -1,3 +1,6 @@
+//	include MessageBox class
+jQuery.sap.require("sap.m.MessageBox");
+
 // 	create a mobile App
 // 	it initializes the HTML page for mobile use and provides animated page handling
 var app = new sap.m.App("ShippingManager", {initialPage:"homepage"});
@@ -10,8 +13,25 @@ var oPath = "";
 var oBusyDialog = new sap.m.BusyDialog({text: "Loading..."});
 var oBusyDialog2 = new sap.m.BusyDialog({text: "Updating..."});
 
-//	include MessageBox class
-jQuery.sap.require("sap.m.MessageBox");
+//	create a button for scanning the barcode
+var oBarcode = new sap.m.Button({
+	icon: "sap-icon://bar-code",
+	enabled: true,
+	press: scanBarcode
+});
+
+//	create a search field
+var oSearchField = new sap.m.SearchField({
+	placeholder: "enter a shipment number",
+	width: "100%",
+	search: function(oEvent){
+		//	get the shipment number
+		aShipment = oEvent.getParameter("query");
+		
+		//	helper function
+		displayDetail(aShipment);
+	}
+});
 
 // 	create a list for displaying the detail of a shipment
 //	bind values to the data model
@@ -44,24 +64,15 @@ var oButton = new sap.m.Button({
 	press: updateStatus
 });
 
-// 	create a search field
-var oSearchField = new sap.m.SearchField({
-	placeholder: "shipment number",
-	width: "100%",
-	search: function(oEvent){
-		//	get the shipment number
-		aShipment = oEvent.getParameter("query");
-		displayDetail(aShipment);
-	}
-});
-
 // 	create a page
-//	add oSearchField to sub header
+//	add oBarcode to hearderContent
+//	add oSearchField to subHeader
 //	add oList to content
 //	add oButton to footer
 var homepage = new sap.m.Page("homepage", {
 	title: "Shipping Manager",
     showNavButton: false,
+    headerContent: [oBarcode],
     subHeader: new sap.m.Bar({
     	contentMiddle: [oSearchField]
     }),
@@ -82,7 +93,19 @@ app.addPage(homepage);
 // 	place the App into the HTML document
 app.placeAt("content"); 
 
-//	my helper functions
+/*============================== my helper functions ==============================*/
+
+//	scan barcode for the shipment number
+function scanBarcode(){
+	cordova.plugins.barcodeScanner.scan(
+		function (result) {
+			oSearchField.setValue(result.text);
+		}, 
+		function (error) {
+			alert("Scanning failed: " + error);
+		}
+   );
+}
 
 //	refresh the shipment detail
 function refreshDetail(){

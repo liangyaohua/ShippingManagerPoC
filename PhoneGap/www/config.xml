@@ -60,6 +60,9 @@
 	<!-- Hide the status bar for iOS 7  -->
 	<gap:plugin name="de.appplant.cordova.plugin.hidden-statusbar-overlay" version="1.2.0" />
 	
+	<!-- Barcode scanner -->
+	<gap:plugin name="com.phonegap.plugins.barcodescanner" version="1.1.0" />
+	
     <!-- Define app icon for each platform. -->
 	<!-- Default -->
     <icon src="icon.png" />
