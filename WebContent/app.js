@@ -163,60 +163,66 @@ function displayDetail(aShipment){
 	} else {
 		//	search field is empty, no data, oButton should be disabled
 		oButton.setEnabled(false);
-		sap.m.MessageBox.show("Please enter a shipment number", sap.m.MessageBox.Icon.WARNING);
+		//	sap.m.MessageBox.show("Please enter a shipment number", sap.m.MessageBox.Icon.WARNING);
 	}
 }
 
 // 	update the status of a shipment
 function updateStatus() {
-	//	open busy dialog and disable the UI during updating
-	oBusyDialog2.open();
-	
-	// 	read update result
-	oModel2.read(oPath, null, null, true, function(oData){
-		//	if update successful, Status returned should be "6" 
-		if(JSON.stringify(oData.Status) == '"6"') {
+	//	ask for confirmation before update
+	sap.m.MessageBox.show("Are you sure?", sap.m.MessageBox.Icon.WARNING, "", [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.CANCEL], function(oAction){
+		//	if user pressed YES, do update
+		if(oAction == sap.m.MessageBox.Action.YES) {
+			//	open busy dialog and disable the UI during updating
+			oBusyDialog2.open();
+			
+			// 	read update result
+			oModel2.read(oPath, null, null, true, function(oData){
+				//	if update successful, Status returned should be "6" 
+				if(JSON.stringify(oData.Status) == '"6"') {
+								
+					//	reload shipment detail and verify if update is successful
+					oModel.read(oPath, null, null, true, function(oData){
+						refreshDetail();
 						
-			//	reload shipment detail and verify if update is successful
-			oModel.read(oPath, null, null, true, function(oData){
-				refreshDetail();
-				
-				//	read oModel and oModel2 successful, close busy dialog
-				oBusyDialog2.close();
-				
-				//	if Sttrg (status) is still "5", means someone has updated the status (to 6) before you
-				//	your click just rolled back the status to 5
-				//	because the update request performs like clicking the button Shipment start in SAP system
-				if(JSON.stringify(oData.Sttrg) == '"5"') {
-					//	someone has already updated the status, but you rolled it back
-					sap.m.MessageBox.show("Please try it again", sap.m.MessageBox.Icon.WARNING);
-				} else if(JSON.stringify(oData.Sttrg) == '"6"') {
-					//	status is updated to 6
-					sap.m.MessageBox.show("Update successful", sap.m.MessageBox.Icon.SUCCESS);
-					oButton.setEnabled(false);
+						//	read oModel and oModel2 successful, close busy dialog
+						oBusyDialog2.close();
+						
+						//	if Sttrg (status) is still "5", means someone has updated the status (to 6) before you
+						//	your click just rolled back the status to 5
+						//	because the update request performs like clicking the button Shipment start in SAP system
+						if(JSON.stringify(oData.Sttrg) == '"5"') {
+							//	someone has already updated the status, but you rolled it back
+							sap.m.MessageBox.show("Please try it again", sap.m.MessageBox.Icon.WARNING);
+						} else if(JSON.stringify(oData.Sttrg) == '"6"') {
+							//	status is updated to 6
+							sap.m.MessageBox.show("Update successful", sap.m.MessageBox.Icon.SUCCESS);
+							oButton.setEnabled(false);
+						} else {
+							//	someone has modified the status
+							sap.m.MessageBox.show("Update failed, the status has been modified", sap.m.MessageBox.Icon.WARNING);
+							oButton.setEnabled(false);
+						}
+					},function(){
+						//	reload shipment detail failed, close busy dialog
+						oBusyDialog2.close();
+					});
 				} else {
-					//	someone has modified the status
-					sap.m.MessageBox.show("Update failed, the status has been modified", sap.m.MessageBox.Icon.WARNING);
-					oButton.setEnabled(false);
+					//	Status returned is not 6, update failed, close busy dialog
+					oBusyDialog2.close();
+					
+					if(JSON.stringify(oData.Message) != '""') {
+						//	show error message returned from SAP
+						sap.m.MessageBox.show(JSON.stringify(oData.Message), sap.m.MessageBox.Icon.ERROR);
+					} else {
+						sap.m.MessageBox.show("Uncaught error, please try it later", sap.m.MessageBox.Icon.ERROR);
+					}
 				}
 			},function(){
-				//	reload shipment detail failed, close busy dialog
+				//	read update result failed
 				oBusyDialog2.close();
+				sap.m.MessageBox.show("Couldn't find the service, please verify your network connection", sap.m.MessageBox.Icon.ERROR);
 			});
-		} else {
-			//	Status returned is not 6, update failed, close busy dialog
-			oBusyDialog2.close();
-			
-			if(JSON.stringify(oData.Message) != '""') {
-				//	show error message returned from SAP
-				sap.m.MessageBox.show(JSON.stringify(oData.Message), sap.m.MessageBox.Icon.ERROR);
-			} else {
-				sap.m.MessageBox.show("Uncaught error, please try it later", sap.m.MessageBox.Icon.ERROR);
-			}
 		}
-	},function(){
-		//	read update result failed
-		oBusyDialog2.close();
-		sap.m.MessageBox.show("Couldn't find the service, please verify your network connection", sap.m.MessageBox.Icon.ERROR);
 	});
 }
