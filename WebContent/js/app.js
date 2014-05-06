@@ -39,11 +39,11 @@ var oList = new sap.m.List({
 			info: "{Tknum}",
 			infoState: "Success"
 		}),
-	    new sap.m.StandardListItem({
-	    	title: "Shipment type",
-	    	description: "{Bezei1}",
-	    	icon: "sap-icon://product",
-	    	info: "{Shtyp}"
+		new sap.m.StandardListItem({
+			title: "Shipment type",
+			description: "{Bezei1}",
+			icon: "sap-icon://product",
+			info: "{Shtyp}"
 	    }),
 	    new sap.m.StandardListItem({
 	    	title: "Shipping type",
@@ -113,7 +113,7 @@ var about = new sap.m.Page("about", {
 	title: "About me",
 	content: [
 	    new sap.m.Text({
-	    	text:"\nHi, I'm an hybrid application, my father is SAPUI5, my mother is PhoneGap and I drink the milk from SAP NetWeaver Gateway OData Service.\n\n",
+	    	text:"\nHi, I'm a hybrid application, my father is SAPUI5, my mother is PhoneGap and I drink the milk from SAP NetWeaver Gateway OData Service.\n\n",
 	    	textAlign: "Center"
 	    }),
         new sap.m.FlexBox({
