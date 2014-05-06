@@ -13,7 +13,7 @@ Step 2: Transform your web app to PhoneGap hybrid app
 - Replace the content of www folder by the files you find in PhoneGap/www
 - Unzip PhoneGap/resources.zip (sapui5 core lib) to www folder
 - Copy all the files in WebContent to www folder
-- Modify some parts of index.html (follow the comments) depending on which platforms you want to build
+- Modify some parts of index.html (follow the comments)
 - Build and run your phonegap project, it should be working on your mobile phone
 
 See the tutorial for more informations on how to setup the development environment and build the SAPUI5 application.

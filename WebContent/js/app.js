@@ -1,3 +1,7 @@
+/*
+* Author: Yaohua Liang @ Capgemini
+*/
+
 //	include MessageBox class
 jQuery.sap.require("sap.m.MessageBox");
 
@@ -13,16 +17,9 @@ var oPath = "";
 var oBusyDialog = new sap.m.BusyDialog({text: "Loading..."});
 var oBusyDialog2 = new sap.m.BusyDialog({text: "Updating..."});
 
-//	create a button for scanning the barcode
-var oBarcode = new sap.m.Button({
-	icon: "sap-icon://bar-code",
-	enabled: true,
-	press: scanBarcode
-});
-
 //	create a search field
 var oSearchField = new sap.m.SearchField({
-	placeholder: "enter a shipment number",
+	placeholder: "please enter a shipment number",
 	width: "100%",
 	search: function(oEvent){
 		//	get the shipment number
@@ -37,58 +34,119 @@ var oSearchField = new sap.m.SearchField({
 //	bind values to the data model
 var oList = new sap.m.List({
 	items: [
-		new sap.m.DisplayListItem({
-			label: "Shipment",
-			value: "{Tknum}"
+		new sap.m.StandardListItem({
+			title: "Shipment",
+			info: "{Tknum}",
+			infoState: "Success"
 		}),
-	    new sap.m.DisplayListItem({
-	    	label: "Shipment type",
-	    	value: "{Shtyp}"
+	    new sap.m.StandardListItem({
+	    	title: "Shipment type",
+	    	description: "{Bezei1}",
+	    	icon: "sap-icon://product",
+	    	info: "{Shtyp}"
 	    }),
-	    new sap.m.DisplayListItem({
-	    	label: "Shipping type",
-	    	value: "{Vsart}"
+	    new sap.m.StandardListItem({
+	    	title: "Shipping type",
+	    	description: "{Bezei2}",
+	    	icon: "sap-icon://travel-itinerary",
+	    	info: "{Vsart}"
 	    }),
-	    new sap.m.DisplayListItem({
-	    	label: "Overall status",
-	    	value: "{Sttrg}"
+	    new sap.m.StandardListItem({
+	    	title: "Overall status",
+	    	description: "{Ddtext}",
+	    	icon: "sap-icon://step",
+	    	info: "{Sttrg}",
+	    	infoState: "Warning"
+	    }),
+	    new sap.m.StandardListItem({
+	    	title: "Forwarding agent",
+	    	description: "{Name1}",
+	    	icon: "sap-icon://person-placeholder",
+	    	info: "{Tdlnr}"
 	    })
 	]
 });
 
+//	create a button for barcode scanner
+var oBarcode = new sap.m.Button({
+	icon: "sap-icon://bar-code",
+	press: scanBarcode
+});
+
 // 	create a button for updating the status of a shipment 
 var oButton = new sap.m.Button({
-	text: "Shipment start",
 	icon: "sap-icon://shipping-status",
 	enabled: false,
 	press: updateStatus
 });
 
+//	turn to page about
+var oLight = new sap.m.Button({
+	icon: "sap-icon://lightbulb",
+	press: function(){
+		app.to("about", "show");
+	}
+});
+
 // 	create a page
-//	add oBarcode to hearderContent
 //	add oSearchField to subHeader
 //	add oList to content
-//	add oButton to footer
+//	add oBarcode, oButton, oLight to footer
 var homepage = new sap.m.Page("homepage", {
 	title: "Shipping Manager",
-    	showNavButton: false,
-    	headerContent: [oBarcode],
-    	subHeader: new sap.m.Bar({
-    		contentMiddle: [oSearchField]
-    	}),
-    	content: [oList],
-    	footer: new sap.m.Bar({
-    		contentLeft: [
-    	          	new sap.m.Label({
-    	        	  	text: "Created by Capgemini"
-    	          	})
-        	],
-        	contentRight: [oButton]
-    	})           
-  });
+	subHeader: new sap.m.Bar({
+		contentMiddle: [oSearchField]
+	}),
+	content: [oList],
+	footer: new sap.m.Bar({
+		contentLeft: [
+		    new sap.m.Label({
+		    	text: "Created by Capgemini"
+	        })
+    	],
+    	contentRight: [oBarcode, oButton, oLight]
+	})           
+});
 
-// 	add homepage to the App
-app.addPage(homepage); 
+//	create a page for introducing this App
+var about = new sap.m.Page("about", {
+	title: "About me",
+	content: [
+	    new sap.m.Text({
+	    	text:"\nHi, I'm an hybrid application, my father is SAPUI5, my mother is PhoneGap and I drink the milk from SAP NetWeaver Gateway OData Service.\n\n",
+	    	textAlign: "Center"
+	    }),
+        new sap.m.FlexBox({
+        	justifyContent: "Center",
+	        alighItems: "Center",
+	        items: [
+	            new sap.m.Image({src: "qrcode.png"})
+	        ]  
+        }),
+        new sap.m.Text({
+        	text:"\nScan the QRCode above to download me!\n\nI'm only available for Android device, if you wanna have me on iOS, please contact my babysister: yaohua.liang@capgemini.com",
+        	textAlign: "Center"
+        })
+    ],
+    footer: new sap.m.Bar({
+    	contentLeft: [
+    	    new sap.m.Label({
+    	        text: "Created by Capgemini"
+    	    })
+    	],
+    	contentRight: [
+    	    new sap.m.Button({
+    	        icon: "sap-icon://home",
+    	       	press: function(){
+    	       		app.to("homepage", "show");
+    	       	}
+    		})
+    	]
+    })
+});
+
+// 	add homepage, about to the App
+app.addPage(homepage).addPage(about); 
 
 // 	place the App into the HTML document
 app.placeAt("content"); 
@@ -97,14 +155,19 @@ app.placeAt("content");
 
 //	scan barcode for the shipment number
 function scanBarcode(){
-	cordova.plugins.barcodeScanner.scan(
-		function (result) {
-			oSearchField.setValue(result.text);
-		}, 
-		function (error) {
-			alert("Scanning failed: " + error);
-		}
-   	);
+	if(sap.ui.Device.os.android == true || sap.ui.Device.os.ios == true) {
+		cordova.plugins.barcodeScanner.scan(
+			function (result) {
+				oSearchField.setValue(result.text);
+			}, 
+			function (error) {
+				sap.m.MessageBox.show("Scanning failed: " + error, sap.m.MessageBox.Icon.WARNING);
+			}
+	  	);
+	} else {
+		sap.m.MessageBox.show("Sorry, your system or device currently doesn't support Barcode scanner", sap.m.MessageBox.Icon.WARNING);
+	}
+	
 }
 
 //	refresh the shipment detail
@@ -163,14 +226,13 @@ function displayDetail(aShipment){
 	} else {
 		//	search field is empty, no data, oButton should be disabled
 		oButton.setEnabled(false);
-		//	sap.m.MessageBox.show("Please enter a shipment number", sap.m.MessageBox.Icon.WARNING);
 	}
 }
 
 // 	update the status of a shipment
 function updateStatus() {
 	//	ask for confirmation before update
-	sap.m.MessageBox.show("Are you sure?", sap.m.MessageBox.Icon.WARNING, "", [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.CANCEL], function(oAction){
+	sap.m.MessageBox.show("Update status to Shipment start?", sap.m.MessageBox.Icon.WARNING, "", [sap.m.MessageBox.Action.YES, sap.m.MessageBox.Action.CANCEL], function(oAction){
 		//	if user pressed YES, do update
 		if(oAction == sap.m.MessageBox.Action.YES) {
 			//	open busy dialog and disable the UI during updating
@@ -179,8 +241,7 @@ function updateStatus() {
 			// 	read update result
 			oModel2.read(oPath, null, null, true, function(oData){
 				//	if update successful, Status returned should be "6" 
-				if(JSON.stringify(oData.Status) == '"6"') {
-								
+				if(JSON.stringify(oData.Status) == '"6"') {			
 					//	reload shipment detail and verify if update is successful
 					oModel.read(oPath, null, null, true, function(oData){
 						refreshDetail();
