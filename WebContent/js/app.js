@@ -218,9 +218,6 @@ function displayDetail(aShipment){
 			//	read failed, close busy dialog
 			oBusyDialog.close();
 			
-			//	oList is empty, oButton should be disabled
-			oButton.setEnabled(false);
-			
 			sap.m.MessageBox.show("Couldn't find the service, please verify your network connection", sap.m.MessageBox.Icon.ERROR);
 		});		
 	} else {
